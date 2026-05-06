@@ -1,0 +1,67 @@
+- tool: questa
+  compile:
+    cmd:
+      - 'vmap mtiUvm $QUESTA_HOME/questasim/uvm-1.2'
+      - 'vlib <cmp_dir>/work'
+      - 'vlog -f dv.f
+              -64
+              -work <cmp_dir>/work
+              -sv
+              <comp_opts>
+              +define+UVM_REGEX_NO_DPI
+              +define+UVM
+              -l <cmp_dir>/compile.log'
+      - 'vopt -64 -work <cmp_dir>/work tb <opt_opts> -o tb_opt -l <cmp_dir>/opt.log -toggleportsonly +cover=sbet+/tb/DUT.'
+  sim:
+    cmd:
+      - 'vsim tb_opt
+              -64
+              -coverage
+              <mode>
+              -work <cmp_dir>/work
+              -sv_seed <seed>
+              <cov_opts>
+              <sim_opts>
+              +UVM_TESTNAME=<rtl_test>
+              +UVM_VERBOSITY=UVM_LOW
+              -l <sim_dir>/sim.log'
+    gui: -gui
+    batch: -c
+
+- tool: xlm
+  compile:
+    cmd:
+      - 'xrun -64bit
+          -f dv.f
+          -sv
+          -uvm
+          -uvmhome CDNS-1.2
+          -define UVM_REGEX_NO_DPI
+          -elaborate
+          -coverage all
+          -covfile vdma.ccf
+          -covdut axi_wr_burst_dispatcher
+          -l <cmp_dir>/compile.log
+          -xmlibdirpath <cmp_dir>
+          <comp_opts>
+          -access +rwc -linedebug'
+  sim:
+    cmd:
+      - 'xrun -64bit
+           -R
+           <mode>
+           -xmlibdirpath <cmp_dir>
+           -covworkdir <sim_dir>/coverage
+           -l <sim_dir>/sim.log
+           -svseed <seed>
+           -coverage all
+           -covfile vdma.ccf
+           -svrnc rand_struct
+           +UVM_TESTNAME=<rtl_test>
+           -nokey
+           +UVM_MAX_QUIT_COUNT=20
+           +UVM_VERBOSITY=UVM_DEBUG
+           -covoverwrite
+           <sim_opts>'
+    gui: -gui
+    batch: -batch
