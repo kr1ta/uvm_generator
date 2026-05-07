@@ -24,7 +24,7 @@ class env extends uvm_env;
     endfunction
 
     virtual function void connect_phase(uvm_phase phase);
-        // make connections
+        // connect agents to scoreboard
     endfunction
 
 endclass

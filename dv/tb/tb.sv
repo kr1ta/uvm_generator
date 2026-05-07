@@ -21,6 +21,8 @@ module tb;
     // Reset interface.
     reset_intf reset_if(clk_i);
 
+    // declare DUT here
+
     initial begin
         uvm_resource_db#(int unsigned)::set(
             "uvm_test_top*", "CLK_PERIOD", CLK_PERIOD);

@@ -40,7 +40,7 @@
           -elaborate
           -coverage all
           -covfile vdma.ccf
-          -covdut axi_wr_burst_dispatcher
+          -covdut tb
           -l <cmp_dir>/compile.log
           -xmlibdirpath <cmp_dir>
           <comp_opts>
