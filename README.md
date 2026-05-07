@@ -12,12 +12,14 @@ python uvm_generator.py <путь_к_папке_template> <префикс> dv|ag
 ```
 
 Примеры:
-1. Создаёт папки `dv/uvm/env`, `dv/uvm/test`, `dv/tb` и `dv/build`, где к файлам добавлен префикс `my_axi`.
-2. Создаёт папку `agent`, где к файлам добавлен префикс `my_axi`.
+1. Создаёт папки `dv/uvm/env`, `dv/uvm/test`, `dv/tb` и `dv/build`, где к файлам добавлен префикс `example`.
+2. Создаёт папку `agent`, где к файлам добавлен префикс `example`.
 ```
-python uvm_generator.py . my_axi dv
-python uvm_generator.py . my_axi agent
+python uvm_generator.py . example dv
+python uvm_generator.py . example agent
 ```
+
+Примеры созданных файлов лежат соответственно в директориях dv/ и agent/
 
 ## Для разработки
 

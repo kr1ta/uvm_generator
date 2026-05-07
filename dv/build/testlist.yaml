@@ -1,0 +1,11 @@
+- test: test
+  description: Base test.
+  tool: xlm
+  iterations: 1
+  sim_opts: -input @"database -open  <sim_dir>/waves -shm;
+            probe -create tb/DUT -waveform -all -depth all;
+            run"
+  opt_opts:
+  comp_opts:
+  cov_opts:
+  rtl_test: example_test_pkg::test
