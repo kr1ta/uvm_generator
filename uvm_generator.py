@@ -32,7 +32,7 @@ def process_uvm_structure(source_root, target_folder_name, prefix):
     """
     1. Копирует указанную папку (dv или agent) из template.
     2. Рекурсивно заменяет {{prefix}} во ВСЕХ файлах внутри новой папки.
-    3. Переименовывает .sv файлы в uvm/test и uvm/env, добавляя префикс.
+    3. Переименовывает .sv файлы в папках, указанных в subdirs_to_process, добавляя префикс.
     """
 
     # 1. Определяем пути
@@ -63,7 +63,6 @@ def process_uvm_structure(source_root, target_folder_name, prefix):
             filepath = os.path.join(root, filename)
             if replace_content_in_file(filepath, prefix, "{{prefix}}"):
                 total_replacements += 1
-                # Можно раскомментировать для детального лога
                 # print(f"  Обновлен: {filepath}")
 
     print(f"Замена шаблонов завершена. Изменено файлов: {total_replacements}")
@@ -89,7 +88,7 @@ def process_uvm_structure(source_root, target_folder_name, prefix):
                     old_filepath = os.path.join(root, filename)
                     new_filepath = os.path.join(root, new_filename)
 
-                    # Если имя уже содержит префикс (например, при повторном запуске или ошибке), можно пропустить
+                    # Если имя уже содержит префикс, пропускаем
                     if filename.startswith(f"{prefix}_"):
                         continue
 
@@ -115,9 +114,9 @@ if __name__ == "__main__":
         print("Пример 2: python uvm_generator.py ./projects my_uart agent")
         sys.exit(1)
 
-    root_path       = sys.argv[1]
-    user_prefix     = sys.argv[2]
-    target_folder   = sys.argv[3].lower()
+    root_path     = sys.argv[1]
+    user_prefix   = sys.argv[2]
+    target_folder = sys.argv[3].lower()
 
     valid_folders = ["dv", "agent"]
     if target_folder not in valid_folders:
