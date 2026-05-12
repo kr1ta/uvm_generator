@@ -4,7 +4,7 @@
 
 class example_item extends uvm_sequence_item;
 
-    `uvm_object_utils(cmd_agent_pkg::example_item)
+    `uvm_object_utils(example_agent_pkg::example_item)
 
     function new(string name = "");
         super.new(name);

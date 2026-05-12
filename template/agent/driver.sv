@@ -6,19 +6,14 @@ class driver extends uvm_driver#({{prefix}}_item);
 
     `uvm_component_utils({{prefix}}_agent_pkg::driver)
 
-    uvm_analysis_port#({{prefix}}_item) ap;
-
     function new(string name = "", uvm_component parent = null);
         super.new(name, parent);
-        ap = new("ap", this);
     endfunction
 
     virtual {{prefix}}_if vif;
 
     int delay_min = 0;
     int delay_max = 10;
-
-    bit is_master = 1;
 
     virtual function void build_phase(uvm_phase phase);
         void'(uvm_resource_db#(int)::read_by_name(
@@ -31,30 +26,21 @@ class driver extends uvm_driver#({{prefix}}_item);
         phase.raise_objection(this);
         vif.wait_for_reset();
 
-        if( is_master )
-            unset_master_data();
-        else
-            vif.tready <= '0;
+        unset_master_data();
 
         vif.wait_for_unreset();
         phase.drop_objection(this);
     endtask
 
     virtual task main_phase(uvm_phase phase);
-        if( is_master )
-            forever begin
-                seq_item_port.get_next_item(req);
-                send_master();
-                seq_item_port.item_done();
-            end
-        else forever begin
-            send_slave();
+        forever begin
+            seq_item_port.get_next_item(req);
+            send_master();
+            seq_item_port.item_done();
         end
     endtask
 
     virtual task send_master();
-        ap.write(req);
-
         do_delay();
 
         vif.tvalid <= '1;
@@ -65,13 +51,6 @@ class driver extends uvm_driver#({{prefix}}_item);
         end while( !vif.tready );
 
         unset_master_data();
-    endtask
-
-    virtual task send_slave();
-        do_delay();
-        vif.tready <= '1;
-        do_delay();
-        vif.tready <= '0;
     endtask
 
     virtual task unset_master_data();

@@ -33,7 +33,6 @@ class monitor extends uvm_monitor;
             while ( !(vif.tready === 1 && vif.tvalid === 1) );
 
             req.tdata = vif.tdata;
-            req.unpack_data();
 
             ap.write(req);
         end

@@ -4,7 +4,7 @@
 
 class {{prefix}}_item extends uvm_sequence_item;
 
-    `uvm_object_utils(cmd_agent_pkg::{{prefix}}_item)
+    `uvm_object_utils({{prefix}}_agent_pkg::{{prefix}}_item)
 
     function new(string name = "");
         super.new(name);

@@ -28,6 +28,50 @@ def replace_content_in_file(filepath, prefix, template_str="{{prefix}}"):
         print(f"  Ошибка при обработке содержимого файла {filepath}: {e}")
         return False
 
+def rename_files_add_prefix(base_path, prefix, extensions=None):
+    """
+    Рекурсивно переименовывает файлы, добавляя prefix в начало имени.
+
+    Например:
+        agent.sv -> my_uart_agent.sv
+
+    Файл tb.sv / tb.svh не переименовывается.
+    """
+    renamed_count = 0
+
+    for root, _, files in os.walk(base_path):
+        for filename in files:
+            name, ext = os.path.splitext(filename)
+
+            if extensions is not None and ext not in extensions:
+                continue
+
+            # Не переименовываем tb.sv / tb.svh
+            if name == "tb":
+                print(f"  Пропуск tb файла: {filename}")
+                continue
+
+            if filename.startswith(f"{prefix}_"):
+                continue
+
+            new_filename = f"{prefix}_{filename}"
+
+            old_filepath = os.path.join(root, filename)
+            new_filepath = os.path.join(root, new_filename)
+
+            if os.path.exists(new_filepath):
+                print(f"  Пропуск: файл уже существует {new_filepath}")
+                continue
+
+            try:
+                os.rename(old_filepath, new_filepath)
+                print(f"  Переименован: {filename} -> {new_filename}")
+                renamed_count += 1
+            except Exception as e:
+                print(f"  Ошибка при переименовании {filename}: {e}")
+
+    return renamed_count
+
 def process_uvm_structure(source_root, target_folder_name, prefix):
     """
     1. Копирует указанную папку (dv или agent) из template.
@@ -43,7 +87,7 @@ def process_uvm_structure(source_root, target_folder_name, prefix):
         print(f"Ошибка: Папка не найдена: {source_target_path}")
         return
 
-    dest_target_path = os.path.join(source_root, target_folder_name)
+    dest_target_path = os.path.join(source_root, f"{prefix}_{target_folder_name}")
 
     # Проверка на существование destination
     if os.path.exists(dest_target_path):
@@ -67,40 +111,21 @@ def process_uvm_structure(source_root, target_folder_name, prefix):
 
     print(f"Замена шаблонов завершена. Изменено файлов: {total_replacements}")
 
-    # 4. Переименование .sv файлов в специфичных подпапках
-    subdirs_to_process = ["uvm", "../agent"]
-    files_renamed_count = 0
+    # 4. Переименование файлов с добавлением префикса
+    print(f"Добавление префикса '{prefix}' к именам файлов...")
 
-    for subdir in subdirs_to_process:
-        current_dir_path = os.path.join(dest_target_path, subdir)
+    extensions_to_process = {".sv", ".svh"}
 
-        if not os.path.exists(current_dir_path):
-            continue
-
-        print(f"Переименование файлов в: {current_dir_path}")
-
-        for root, _, files in os.walk(current_dir_path):
-            for filename in files:
-                if filename.endswith(".sv"):
-                    name, ext = os.path.splitext(filename)
-                    new_filename = f"{prefix}_{name}{ext}"
-
-                    old_filepath = os.path.join(root, filename)
-                    new_filepath = os.path.join(root, new_filename)
-
-                    # Если имя уже содержит префикс, пропускаем
-                    if filename.startswith(f"{prefix}_"):
-                        continue
-
-                    try:
-                        os.rename(old_filepath, new_filepath)
-                        print(f"  Переименован: {filename} -> {new_filename}")
-                        files_renamed_count += 1
-                    except Exception as e:
-                        print(f"  Ошибка при переименовании {filename}: {e}")
+    files_renamed_count = rename_files_add_prefix(
+        dest_target_path,
+        prefix,
+        extensions=extensions_to_process
+    )
 
     if files_renamed_count == 0:
-        print("Файлы .sv для переименования не найдены (или уже переименованы).")
+        print("Файлы для переименования не найдены или уже имеют префикс.")
+    else:
+        print(f"Переименовано файлов: {files_renamed_count}")
 
     print("Готово.")
 

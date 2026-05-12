@@ -39,7 +39,6 @@ class agent extends uvm_agent;
         // Set interface.
         driver .vif = vif;
         monitor.vif = vif;
-
     endfunction
 
 endclass
